@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: 'mysql:8.3'
+    environment:
+      - 'MYSQL_DATABASE=lupang-database'
+      - 'MYSQL_PASSWORD=admin'
+      - 'MYSQL_ROOT_PASSWORD=admin'
+      - 'MYSQL_USER=admin'
+    ports:
+      - '3306'
+    volumes:
+      - '.db''

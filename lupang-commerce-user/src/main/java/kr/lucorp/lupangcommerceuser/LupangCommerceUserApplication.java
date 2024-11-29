@@ -1,13 +1,13 @@
-package kr.lucorp.lupangcommerceadmin;
+package kr.lucorp.lupangcommerceuser;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LupangCommerceAdminApplication {
+public class LupangCommerceUserApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(LupangCommerceAdminApplication.class, args);
+    SpringApplication.run(LupangCommerceUserApplication.class, args);
   }
 
 }

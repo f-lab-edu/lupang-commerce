@@ -1,8 +1,8 @@
 package kr.lucorp.lupangcommerceuser.provider.sms;
 
 import jakarta.annotation.PostConstruct;
-import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCodes;
-import kr.lucorp.lupangcommerceuser.core.exception.defined.sms.SmsMessageNotReceivedException;
+import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
+import kr.lucorp.lupangcommerceuser.core.exception.defined.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -43,7 +43,7 @@ public class CoolSmsCertificationProvider {
       messageService.send(message);
     } catch (Exception e) {
       log.warn(e.getMessage());
-      throw new SmsMessageNotReceivedException(ErrorCodes.failSmsMessageNotReceived());
+      throw new BusinessException(ErrorCode.FAIL_SMS_MESSAGE_NOT_RECEIVED);
     }
   }
 }

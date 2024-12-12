@@ -28,3 +28,12 @@ aes:
   key: abcdefghabcdefgh
   iv: 0123456789abcdef
   algorithms: AES/CBC/PKCS5Padding
+
+sms:
+  try:
+    count: 5
+  fail:
+    count: 5
+  code:
+    expired:
+      minute: 3

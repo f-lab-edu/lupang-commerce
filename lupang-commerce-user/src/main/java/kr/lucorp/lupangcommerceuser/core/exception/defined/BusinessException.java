@@ -1,17 +1,17 @@
 package kr.lucorp.lupangcommerceuser.core.exception.defined;
 
-import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCodes;
+import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
 import kr.lucorp.lupangcommerceuser.common.client.model.ResponseError;
 import kr.lucorp.lupangcommerceuser.common.client.model.ResponseObject;
 import org.springframework.http.HttpStatus;
 
-public abstract class BusinessException extends RuntimeException{
+public class BusinessException extends RuntimeException{
 
-  private final transient ErrorCodes errorCodes;
+  private final transient ErrorCode errorCode;
 
-  protected BusinessException(ErrorCodes errorCodes) {
-    super(errorCodes.detailMessage());
-    this.errorCodes = errorCodes;
+  public BusinessException(ErrorCode errorCode) {
+    super(errorCode.toString());
+    this.errorCode = errorCode;
   }
 
   // 예외 발생시 error 내용을 ResponseError에 추가
@@ -19,10 +19,8 @@ public abstract class BusinessException extends RuntimeException{
     ResponseObject<T> response = new ResponseObject<>();
 
     response.addError(ResponseError.builder()
-        .status(Integer.toString(errorCodes.errorCode().getStatus().value()))
-        .detail(errorCodes.detailMessage())
-        .title(errorCodes.errorCode().getTitle())
-        .code(errorCodes.errorCode().getCode())
+        .status(Integer.toString(errorCode.getStatus().value()))
+        .code(errorCode.getCode())
         .build()
     );
 
@@ -30,6 +28,6 @@ public abstract class BusinessException extends RuntimeException{
   }
 
   public HttpStatus getHttpStatus() {
-    return this.errorCodes.errorCode().getStatus();
+    return this.errorCode.getStatus();
   }
 }

@@ -27,6 +27,10 @@ public class ResponseUtils {
     return new ResponseEntity<>(ex.getBody(), getDefaultHttpHeaders(), ex.getHttpStatus());
   }
 
+  public static <T> ResponseEntity<ResponseObject<T>> createResponseEntityByGlobalException(HttpStatus status) {
+    return new ResponseEntity<>(null, getDefaultHttpHeaders(), status);
+  }
+
   public static <T> ResponseEntity<ResponseObject<T>> createResponseEntity(T data, HttpStatus status) {
     ResponseObject<T> responseObject = new ResponseObject<>();
     responseObject.setData(data);

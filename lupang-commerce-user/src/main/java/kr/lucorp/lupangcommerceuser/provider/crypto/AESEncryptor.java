@@ -5,8 +5,8 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCodes;
-import kr.lucorp.lupangcommerceuser.core.exception.defined.crypto.CryptoException;
+import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
+import kr.lucorp.lupangcommerceuser.core.exception.defined.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class AESEncryptor {
     } catch (Exception e) {
       //NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
       log.error("암호화 도중 에러 발생 : {}", e.getMessage());
-      throw new CryptoException(ErrorCodes.failCryptoEncryptAES());
+      throw new BusinessException(ErrorCode.FAIL_CRYPTO_ENCRYPT_ERROR);
     }
   }
 
@@ -60,7 +60,7 @@ public class AESEncryptor {
       // Iv로 SPEC 생성
       IvParameterSpec ivParameterSpec = new IvParameterSpec(aesIv.getBytes());
 
-      // ��호화 적용
+      // 복호화 적용
       cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
 
       byte[] decodedByte = Base64.getDecoder().decode(encryptedText);
@@ -69,7 +69,7 @@ public class AESEncryptor {
       return new String(decryptedByte, StandardCharsets.UTF_8);
     } catch (Exception e) {
       log.error("복호화 도중 에러 발생 : {}", e.getMessage());
-      throw new CryptoException(ErrorCodes.failCryptoDecryptAES());
+      throw new BusinessException(ErrorCode.FAIL_CRYPTO_ENCRYPT_ERROR);
     }
   }
 }

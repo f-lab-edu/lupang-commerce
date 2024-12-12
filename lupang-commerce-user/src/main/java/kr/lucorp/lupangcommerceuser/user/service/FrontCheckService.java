@@ -1,7 +1,7 @@
 package kr.lucorp.lupangcommerceuser.user.service;
 
-import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCodes;
-import kr.lucorp.lupangcommerceuser.core.exception.defined.signup.FrontValidationException;
+import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
+import kr.lucorp.lupangcommerceuser.core.exception.defined.BusinessException;
 import kr.lucorp.lupangcommerceuser.user.repository.FrontCheckRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +20,10 @@ public class FrontCheckService {
   public void checkDuplicateEmail(String email) {
     //중복된 이메일 검증
     email = email.toLowerCase();
-    Integer cnt = frontCheckRepository.cntDuplicateEmail(email);
+    Boolean isExist = frontCheckRepository.cntDuplicateEmail(email);
 
-    if(cnt > 0) {
-      throw new FrontValidationException(ErrorCodes.invalidDuplicateEmail());
+    if(Boolean.TRUE.equals(isExist)) {
+      throw new BusinessException(ErrorCode.INVALID_DUPLICATE_EMAIL);
     }
   }
 
@@ -32,11 +32,10 @@ public class FrontCheckService {
     phoneNumber = phoneNumber.replaceAll("\\D", "");
 
     // 중복된 회원 전화번호 검증
-    Integer cnt = frontCheckRepository.cntDuplicatePhoneNumber(phoneNumber);
+    Boolean isExist = frontCheckRepository.cntDuplicatePhoneNumber(phoneNumber);
 
-    if(cnt > 0) {
-      throw new FrontValidationException(ErrorCodes.invalidDuplicatePhoneNumber());
+    if(Boolean.TRUE.equals(isExist)) {
+      throw new BusinessException(ErrorCode.INVALID_DUPLICATE_PHONE_NUMBER);
     }
-
   }
 }

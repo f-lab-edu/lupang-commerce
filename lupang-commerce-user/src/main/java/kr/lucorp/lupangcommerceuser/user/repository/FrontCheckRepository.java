@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FrontCheckRepository extends UserRepository{
 
-  @Query("SELECT count(ui.id) FROM UserInfo ui WHERE ui.email = :email")
-  Integer cntDuplicateEmail(@Param("email") String email);
+  @Query("SELECT exists(ui.id) FROM UserInfo ui WHERE ui.email = :email")
+  Boolean cntDuplicateEmail(@Param("email") String email);
 
-  @Query("SELECT count(ui.id) FROM UserInfo ui WHERE ui.phoneNumber = :phoneNumber")
-  Integer cntDuplicatePhoneNumber(@Param("phoneNumber") String phoneNumber);
+  @Query("SELECT exists (ui.id) FROM UserInfo ui WHERE ui.phoneNumber = :phoneNumber")
+  Boolean cntDuplicatePhoneNumber(@Param("phoneNumber") String phoneNumber);
 }

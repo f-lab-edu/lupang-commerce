@@ -1,16 +1,19 @@
 package kr.lucorp.lupangcommerceuser.user.controller;
 
+import java.util.HashMap;
 import java.util.Map;
-import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCodes;
+import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
 import kr.lucorp.lupangcommerceuser.common.client.model.ResponseObject;
 import kr.lucorp.lupangcommerceuser.common.util.CheckValidation;
-import kr.lucorp.lupangcommerceuser.core.exception.defined.signup.FrontValidationException;
+import kr.lucorp.lupangcommerceuser.common.util.ResponseUtils;
+import kr.lucorp.lupangcommerceuser.core.exception.defined.BusinessException;
 import kr.lucorp.lupangcommerceuser.user.domain.dto.CertificationSmsVerifyRequest;
 import kr.lucorp.lupangcommerceuser.user.domain.dto.UserSignUpRequest;
 import kr.lucorp.lupangcommerceuser.user.service.FrontCheckService;
 import kr.lucorp.lupangcommerceuser.user.service.CertificationService;
 import kr.lucorp.lupangcommerceuser.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +42,7 @@ public class UserSignUpController {
 
     //1. 이메일 형식 검증
     if(email == null || !CheckValidation.isValidEmail(email)) {
-      throw new FrontValidationException(ErrorCodes.invalidInputEmail());
+      throw new BusinessException(ErrorCode.INVALID_INPUT_EMAIL);
     }
 
     //2. 이메일 중복 검증
@@ -56,7 +59,7 @@ public class UserSignUpController {
 
     //1. 전화번호 형식 검증
     if(phoneNumber == null || !CheckValidation.isValidPhoneNumber(phoneNumber)) {
-      throw new FrontValidationException(ErrorCodes.invalidInputPhoneNumber());
+      throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
     }
 
     //2. 전화번호로 가입된 회원 여부 확인
@@ -73,7 +76,7 @@ public class UserSignUpController {
 
     //1. 전화번호 형식 검증
     if(phoneNumber == null || !CheckValidation.isValidPhoneNumber(phoneNumber)) {
-      throw new FrontValidationException(ErrorCodes.invalidInputPhoneNumber());
+      throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
     }
 
     //2. 전화번호로 가입된 회원 여부 확인
@@ -89,31 +92,42 @@ public class UserSignUpController {
    * @param certificationSmsVerifyRequest
    */
   @PostMapping("/signup/verifySmsCertCode")
-  public ResponseEntity<ResponseObject<Map<String, Boolean>>> verifySmsCertCode(@RequestBody
+  public ResponseEntity<ResponseObject<Map<String, String>>> verifySmsCertCode(@RequestBody
       CertificationSmsVerifyRequest certificationSmsVerifyRequest) {
 
     return certificationService.actionCertificationSmsVerify(certificationSmsVerifyRequest);
   }
 
-
-
-  //todo 4-1. 회원가입 V1 API(단순 회원가입 처리)
-  //todo 4-2. 비밀번호 유효성 체크 API
+  /**
+   * 회원가입 API
+   *
+   * @param userSignUpRequest
+   * @return
+   */
   @PostMapping("/v1/signup")
-  public ResponseEntity<Map<String, Object>> SignUp(@RequestBody UserSignUpRequest userSignUpRequest) {
+  public ResponseEntity<ResponseObject<Map<String, Boolean>>> SignUp(@RequestBody UserSignUpRequest userSignUpRequest) {
 
-    //todo. 일단 목요일까지 해야할거 정리
-    //     - 이메일 중복, 비밀번호 유효성, 회원가입 API 요 3개까지만 먼저 구현
-    //     - swagger 도입
-    //     - DB 설계 (user_info, acceptance_terms) -> 일단 2가지
+    //1. 이메일 형식 검증
+    if(userSignUpRequest.getEmail() == null || !CheckValidation.isValidEmail(userSignUpRequest.getEmail())) {
+      throw new BusinessException(ErrorCode.INVALID_INPUT_EMAIL);
+    }
 
-    return ResponseEntity.ok().build();
-  }
+    //2. 전화번호 형식 검증
+    if(userSignUpRequest.getPhoneNumber() == null || !CheckValidation.isValidPhoneNumber(userSignUpRequest.getPhoneNumber())) {
+      throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
+    }
 
+    //3. 비밀번호 유효성 검증
+    if(userSignUpRequest.getPassword() == null || !CheckValidation.isValidPassword(userSignUpRequest.getPassword(),
+        userSignUpRequest.getEmail())) {
+      throw new BusinessException(ErrorCode.INVALID_INPUT_PASSWORD);
+    }
 
-  //todo 4-2 회원가입 V2 API(회원가입시 자동으로 로그인 처리)
-  @PostMapping("/v2/signup")
-  public ResponseEntity<Map<String, Object>> SignUpAndLogin(@RequestBody UserSignUpRequest userSignUpRequest) {
-    return ResponseEntity.ok().build();
+    //4. 약관동의 여부 검증
+    if(userSignUpRequest.getTermsDto() == null || !CheckValidation.isValidAcceptanceTerms(userSignUpRequest.getTermsDto())) {
+      throw new BusinessException(ErrorCode.INVALID_INPUT_ACCEPTANCE_OF_TERMS);
+    }
+
+    return userService.saveUserJoin(userSignUpRequest);
   }
 }

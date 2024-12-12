@@ -12,8 +12,10 @@ import java.util.List;
 import kr.lucorp.lupangcommerceuser.common.client.model.BaseEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @RequiredArgsConstructor
 @Entity
 @Table(name = "user_info")

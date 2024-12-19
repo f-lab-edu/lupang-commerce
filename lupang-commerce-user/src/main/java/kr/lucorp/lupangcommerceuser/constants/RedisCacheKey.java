@@ -10,7 +10,7 @@ public enum RedisCacheKey {
 
   SMS_CERTIFICATE_KEY(
       value -> "sms:certificate:key:" + value,
-      Duration.ofMinutes(5).getSeconds()
+      Duration.ofMinutes(10).getSeconds()
   );
 
   private final Function<Object, String> generateRedisKey;

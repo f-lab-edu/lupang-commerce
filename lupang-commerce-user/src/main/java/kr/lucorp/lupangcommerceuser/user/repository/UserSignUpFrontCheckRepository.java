@@ -5,7 +5,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FrontCheckRepository extends UserRepository{
+public interface UserSignUpFrontCheckRepository extends UserRepository{
 
   @Query("SELECT exists(ui.id) FROM UserInfo ui WHERE ui.email = :email")
   Boolean cntDuplicateEmail(@Param("email") String email);

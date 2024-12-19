@@ -23,7 +23,7 @@ public class SmsRedisProvider implements RedisProvider<SmsInfo> {
     redisTemplate.opsForValue().set(key, data, timeoutSec, TimeUnit.SECONDS);
   }
 
-  public int increaseSmsTryCount(String key, SmsInfo smsInfo) {
+  public void increaseSmsTryCount(String key, SmsInfo smsInfo) {
     if(smsInfo != null) {
       executeTaskBySetnxLock(key, smsInfo, () -> {
         smsInfo.incrementTryCount();            // 시도횟수 증가
@@ -32,23 +32,20 @@ public class SmsRedisProvider implements RedisProvider<SmsInfo> {
           redisTemplate.opsForValue().set(key, smsInfo, redisExpireTime, TimeUnit.SECONDS);
         }
       });
-      return smsInfo.getTryCount();
     }
-    return 0;
   }
 
-  public int increaseSmsFailedCount(String key, SmsInfo smsInfo) {
+  public void increaseSmsFailedCount(String key, SmsInfo smsInfo, int maxFailedCount) {
     if (smsInfo != null) {
       executeTaskBySetnxLock(key, smsInfo, () -> {
-        smsInfo.incrementFailedCount();            // 실패횟수 증가
+        smsInfo.incrementFailedCount();                // 실패횟수 증가
+        smsInfo.verifyFailedStatus(maxFailedCount);    // 최대 실패 횟수 초과시 차단 상태로 변경
         Long redisExpireTime = redisTemplate.getExpire(key, TimeUnit.SECONDS);
         if(redisExpireTime != null && redisExpireTime > 0) {
           redisTemplate.opsForValue().set(key, smsInfo, redisExpireTime, TimeUnit.SECONDS);
         }
       });
-      return smsInfo.getTryCount();
     }
-    return 0;
   }
 
   private void executeTaskBySetnxLock(String key, SmsInfo smsInfo, Runnable task) {

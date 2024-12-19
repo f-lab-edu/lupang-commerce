@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-  private final FrontCheckService frontCheckService;
+  private final UserSignUpFrontCheckService userSignUpFrontCheckService;
   private final UserRepository userRepository;
   private final UserTermsAgreementRepository userTermsAgreementRepository;
   private final AESEncryptor aesEncryptor;
@@ -40,10 +40,10 @@ public class UserService {
   public ResponseEntity<ResponseObject<Map<String, Boolean>>> saveUserJoin(UserSignUpRequest userSignUpRequest) {
 
     // 1. 이메일 중복 검증
-    frontCheckService.checkDuplicateEmail(userSignUpRequest.getEmail());
+    userSignUpFrontCheckService.checkDuplicateEmail(userSignUpRequest.getEmail());
 
     // 2. 전화번호 중복 검증
-    frontCheckService.checkDuplicatePhoneNumber(userSignUpRequest.getPhoneNumber());
+    userSignUpFrontCheckService.checkDuplicatePhoneNumber(userSignUpRequest.getPhoneNumber());
     userSignUpRequest.setPhoneNumber(userSignUpRequest.getPhoneNumber().replaceAll("\\D", ""));
 
     // 3. 토큰 검증

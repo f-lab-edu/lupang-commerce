@@ -12,6 +12,8 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: validate
+      naming:
+        physical-strategy: kr.lucorp.lupangcommerceuser.core.config.PropertyBasedPhysicalNamingStrategy
   data:
     redis:
       host: localhost
@@ -37,3 +39,24 @@ sms:
   code:
     expired:
       minute: 3
+
+entity:
+  column:
+    userTermsAgreement:
+      userInfo:
+        userId: user_id
+      terms:
+        termsName: terms_name
+        termsVersion: terms_version
+    userInfo:
+      id: user_id
+      email: email
+      phoneNumber: phone_number
+      userName: user_name
+      passwdEnc: passwd_enc
+    terms:
+      termsId:
+        name: terms_name
+        version: terms_version
+      orderType: order_type
+      content: content

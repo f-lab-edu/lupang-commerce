@@ -8,10 +8,16 @@ import org.springframework.http.HttpStatus;
 public class BusinessException extends RuntimeException{
 
   private final transient ErrorCode errorCode;
+  private final String errorInfo;
 
-  public BusinessException(ErrorCode errorCode) {
+  public BusinessException(ErrorCode errorCode, String errorInfo) {
     super(errorCode.toString());
     this.errorCode = errorCode;
+    this.errorInfo = errorInfo;
+  }
+
+  public BusinessException(ErrorCode errorCode) {
+    this(errorCode, null);
   }
 
   // 예외 발생시 error 내용을 ResponseError에 추가
@@ -27,7 +33,20 @@ public class BusinessException extends RuntimeException{
     return response;
   }
 
+  //로그 수준 : 4XX = true
+  public boolean isClientError() {
+    return this.errorCode.getStatus().is4xxClientError();
+  }
+
   public HttpStatus getHttpStatus() {
     return this.errorCode.getStatus();
+  }
+
+  @Override
+  public String toString() {
+    return "BusinessException{" +
+        "errorCode=" + errorCode +
+        ", errorInfo='" + errorInfo + '\'' +
+        '}';
   }
 }

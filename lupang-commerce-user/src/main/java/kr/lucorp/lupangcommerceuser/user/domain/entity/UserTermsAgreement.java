@@ -26,13 +26,13 @@ public class UserTermsAgreement extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JoinColumn(referencedColumnName = "id")
   private UserInfo userInfo;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumns({
-      @JoinColumn(name = "terms_name", referencedColumnName = "name", nullable = false),
-      @JoinColumn(name = "terms_version", referencedColumnName = "version", nullable = false)
+      @JoinColumn(referencedColumnName = "name", nullable = false),
+      @JoinColumn(referencedColumnName = "version", nullable = false)
   })
   private Terms terms;
 }

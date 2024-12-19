@@ -17,7 +17,10 @@ public class BusinessExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
   protected <T> ResponseEntity<ResponseObject<T>> handleBusinessException(BusinessException e) {
-    log.error("BusinessException : {}", e.getMessage());
+    if(e.isClientError()) {
+      log.warn("Client 에러 : {}", e.toString());
+    }
+    log.error("Server 에러 : {}", e.toString());
     return ResponseUtils.createResponseEntityByException(e);
   }
 }

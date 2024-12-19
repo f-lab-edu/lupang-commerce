@@ -1,19 +1,16 @@
 package kr.lucorp.lupangcommerceuser.user.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 import kr.lucorp.lupangcommerceuser.common.client.model.ErrorCode;
 import kr.lucorp.lupangcommerceuser.common.client.model.ResponseObject;
 import kr.lucorp.lupangcommerceuser.common.util.CheckValidation;
-import kr.lucorp.lupangcommerceuser.common.util.ResponseUtils;
 import kr.lucorp.lupangcommerceuser.core.exception.defined.BusinessException;
 import kr.lucorp.lupangcommerceuser.user.domain.dto.CertificationSmsVerifyRequest;
 import kr.lucorp.lupangcommerceuser.user.domain.dto.UserSignUpRequest;
-import kr.lucorp.lupangcommerceuser.user.service.FrontCheckService;
+import kr.lucorp.lupangcommerceuser.user.service.UserSignUpFrontCheckService;
 import kr.lucorp.lupangcommerceuser.user.service.CertificationService;
 import kr.lucorp.lupangcommerceuser.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserSignUpController {
 
   private final UserService userService;
-  private final FrontCheckService frontCheckService;
+  private final UserSignUpFrontCheckService userSignUpFrontCheckService;
   private final CertificationService certificationService;
 
   /**
@@ -39,14 +36,8 @@ public class UserSignUpController {
    */
   @GetMapping("/signup/checkEmailDuplication")
   public void checkEmailDuplication(@RequestParam(name = "email") String email) {
-
-    //1. 이메일 형식 검증
-    if(email == null || !CheckValidation.isValidEmail(email)) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT_EMAIL);
-    }
-
-    //2. 이메일 중복 검증
-    frontCheckService.checkDuplicateEmail(email);
+    email = validateEmail(email);
+    userSignUpFrontCheckService.checkDuplicateEmail(email);
   }
 
   /**
@@ -56,14 +47,9 @@ public class UserSignUpController {
    */
   @GetMapping("/signup/checkPhoneNumberDuplication")
   public void checkPhoneNumberDuplication(@RequestParam(name = "phoneNumber") String phoneNumber) {
-
     //1. 전화번호 형식 검증
-    if(phoneNumber == null || !CheckValidation.isValidPhoneNumber(phoneNumber)) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
-    }
-
-    //2. 전화번호로 가입된 회원 여부 확인
-    frontCheckService.checkDuplicatePhoneNumber(phoneNumber);
+    phoneNumber = validatePhoneNumber(phoneNumber);
+    userSignUpFrontCheckService.checkDuplicatePhoneNumber(phoneNumber);
   }
 
   /**
@@ -74,13 +60,9 @@ public class UserSignUpController {
   @GetMapping("/signup/sendSmsCertCode")
   public void sendSmsCertCode(@RequestParam(name = "phoneNumber") String phoneNumber) {
 
-    //1. 전화번호 형식 검증
-    if(phoneNumber == null || !CheckValidation.isValidPhoneNumber(phoneNumber)) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
-    }
-
-    //2. 전화번호로 가입된 회원 여부 확인
-    frontCheckService.checkDuplicatePhoneNumber(phoneNumber);
+    //1. 전화번호로 가입된 회원 여부 확인
+    phoneNumber = validatePhoneNumber(phoneNumber);
+    userSignUpFrontCheckService.checkDuplicatePhoneNumber(phoneNumber);
 
     //3. sms 인증번호 발송
     certificationService.actionCertificationSmsRequest(phoneNumber);
@@ -94,7 +76,7 @@ public class UserSignUpController {
   @PostMapping("/signup/verifySmsCertCode")
   public ResponseEntity<ResponseObject<Map<String, String>>> verifySmsCertCode(@RequestBody
       CertificationSmsVerifyRequest certificationSmsVerifyRequest) {
-
+    certificationSmsVerifyRequest.validate();
     return certificationService.actionCertificationSmsVerify(certificationSmsVerifyRequest);
   }
 
@@ -106,28 +88,27 @@ public class UserSignUpController {
    */
   @PostMapping("/v1/signup")
   public ResponseEntity<ResponseObject<Map<String, Boolean>>> SignUp(@RequestBody UserSignUpRequest userSignUpRequest) {
+    userSignUpRequest.validate();
+    return userService.saveUserJoin(userSignUpRequest);
+  }
 
-    //1. 이메일 형식 검증
-    if(userSignUpRequest.getEmail() == null || !CheckValidation.isValidEmail(userSignUpRequest.getEmail())) {
+  /**
+   * 이메일 검증 로직 공통화
+   */
+  private String validateEmail(String email) {
+    if (email == null || !CheckValidation.isValidEmail(email)) {
       throw new BusinessException(ErrorCode.INVALID_INPUT_EMAIL);
     }
+    return email.toLowerCase();
+  }
 
-    //2. 전화번호 형식 검증
-    if(userSignUpRequest.getPhoneNumber() == null || !CheckValidation.isValidPhoneNumber(userSignUpRequest.getPhoneNumber())) {
+  /**
+   * 전화번호 검증 로직 공통화
+   */
+  private String validatePhoneNumber(String phoneNumber) {
+    if (phoneNumber == null || !CheckValidation.isValidPhoneNumber(phoneNumber)) {
       throw new BusinessException(ErrorCode.INVALID_INPUT_PHONE_NUMBER);
     }
-
-    //3. 비밀번호 유효성 검증
-    if(userSignUpRequest.getPassword() == null || !CheckValidation.isValidPassword(userSignUpRequest.getPassword(),
-        userSignUpRequest.getEmail())) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT_PASSWORD);
-    }
-
-    //4. 약관동의 여부 검증
-    if(userSignUpRequest.getTermsDto() == null || !CheckValidation.isValidAcceptanceTerms(userSignUpRequest.getTermsDto())) {
-      throw new BusinessException(ErrorCode.INVALID_INPUT_ACCEPTANCE_OF_TERMS);
-    }
-
-    return userService.saveUserJoin(userSignUpRequest);
+    return phoneNumber.replaceAll("\\D", "");
   }
 }

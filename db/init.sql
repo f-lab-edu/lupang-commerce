@@ -62,6 +62,10 @@ INSERT INTO terms (version, order_type, name, content) VALUES ('1.0', false, '�
 INSERT INTO terms (version, order_type, name, content) VALUES ('1.0', false, 'SMS, SNS 수신 동의', '선택 약관 내용');
 INSERT INTO terms (version, order_type, name, content) VALUES ('1.0', false, '앱 푸시 수신 동의', '선택 약관 내용');
 
+INSERT INTO terms (version, order_type, name, content) VALUES ('1.3', true, '만 14세 이상입니다', '필수 약관 내용');
+INSERT INTO terms (version, order_type, name, content) VALUES ('1.3', true, '개인정보 제3자 제공 동의', '필수 약관 내용');
+INSERT INTO terms (version, order_type, name, content) VALUES ('2.0', false, '마케팅 목적의 개인정보 수집 및 이용 동의', '선택 약관 내용');
+INSERT INTO terms (version, order_type, name, content) VALUES ('2.0', false, '이메일 수신 동의', '선택 약관 내용');
 
 
 

@@ -19,10 +19,10 @@ public class Terms extends BaseEntity {
   @EmbeddedId
   private TermsId termsId;
 
-  @Column(name = "order_type")
+  @Column
   private Boolean orderType = false;    // 필수(true) or 선택(false)
 
-  @Column(name = "content")
+  @Column
   private String content;     // 약관 설명
 }
 

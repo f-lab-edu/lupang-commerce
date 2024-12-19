@@ -23,19 +23,19 @@ public class UserInfo extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
+  @Column
   private Long id;
 
-  @Column(name = "email")
+  @Column
   private String email;
 
-  @Column(name = "phone_number")
+  @Column
   private String phoneNumber;
 
-  @Column(name = "user_name")
+  @Column
   private String userName;
 
-  @Column(name = "passwd_enc")
+  @Column
   private String passwdEnc;
 
   @OneToMany(mappedBy = "userInfo", cascade = CascadeType.PERSIST)

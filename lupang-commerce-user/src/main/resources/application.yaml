@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: 'lupang-commerce-user'
+  datasource:
+    url: jdbc:mysql://localhost:3306/lupang_schema
+    username: admin
+    password: admin
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: kr.lucorp.lupangcommerceuser.core.config.PropertyBasedPhysicalNamingStrategy
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+coolsms:
+  apikey: ${COOLSMS_API_KEY}
+  apisecret: ${COOLSMS_API_SECRET}
+  baseurl: https://api.coolsm.co.kr
+  from:
+    number: ${FROM_PHONE_NUMBER}
+
+aes:
+  key: abcdefghabcdefgh
+  iv: 0123456789abcdef
+  algorithms: AES/CBC/PKCS5Padding
+
+sms:
+  try:
+    count: 5
+  fail:
+    count: 5
+  code:
+    expired:
+      minute: 3
+
+entity:
+  column:
+    userTermsAgreement:
+      userInfo:
+        userId: user_id
+      terms:
+        termsName: terms_name
+        termsVersion: terms_version
+    userInfo:
+      id: user_id
+      email: email
+      phoneNumber: phone_number
+      userName: user_name
+      passwdEnc: passwd_enc
+    terms:
+      termsId:
+        name: terms_name
+        version: terms_version
+      orderType: order_type
+      content: content
